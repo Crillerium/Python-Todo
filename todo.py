@@ -19,6 +19,14 @@ def update_todo(task_id, task):
     print(f"Task with ID {task_id} has been updated!")
     conn.close()
 
+def update_id(old_id, new_id):
+    conn = sqlite3.connect(path)
+    c = conn.cursor()
+    c.execute("UPDATE todos SET id = ? WHERE id = ?", (new_id, old_id))
+    conn.commit()
+    print(f"Task ID {old_id} has been updated!")
+    conn.close()
+
 def delete_todo(task_id):
     conn = sqlite3.connect(path)
     c = conn.cursor()
@@ -51,6 +59,7 @@ def main():
     parser.add_argument('--list', '-l', action='store_true', help='list all tasks')
     parser.add_argument('--add', '-a', help='add a task')
     parser.add_argument('--update', '-u', nargs=2, help='update a task')
+    parser.add_argument('--id', '-i', nargs=2, help='change a task id')
     parser.add_argument('--delete', '-d', type=int, help='delete a task')
     args = parser.parse_args()
 
@@ -60,6 +69,8 @@ def main():
         create_todo(args.add)
     elif args.update:
         update_todo(args.update[0], args.update[1])
+    elif args.id:
+        update_id(args.id[0],args.id[1])
     elif args.delete:
         delete_todo(args.delete)
 
