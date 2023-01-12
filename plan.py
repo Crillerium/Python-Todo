@@ -12,15 +12,6 @@ except:
 conn = sqlite3.connect(sys.argv[0].replace('plan.py','plan.db'))
 cursor = conn.cursor()
 
-# Create table if it doesn't exist
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS plans (
-        id INTEGER PRIMARY KEY,
-        plan TEXT NOT NULL,
-        duedate DATE NOT NULL
-    )
-''')
-
 # Create argparse object
 parser = argparse.ArgumentParser(description="A command line dateplanner")
 
@@ -31,6 +22,7 @@ parser.add_argument('-l', '--list', action='store_true', help='List all plans')
 parser.add_argument('-d', '--delete', dest='plan_id', type=int, help='Delete a plan')
 parser.add_argument("-u", "--update", help="Id of the plan you want to modify", type=int)
 parser.add_argument("-p", "--newplan", help="New plan", type=str)
+parser.add_argument('--id', '-i', nargs=2, help='change a task id')
 
 # Parse arguments
 args = parser.parse_args()
@@ -85,5 +77,11 @@ elif args.update and (args.newplan or args.due_date):
         cursor.execute("UPDATE plans SET duedate = ? WHERE id = ?", (due_date, args.update))
     conn.commit()
     print("Plan modified successfully!")
+
+elif args.id:
+    cursor.execute("UPDATE plans SET id = ? WHERE id = ?", (args.id[1], args.id[0]))
+    conn.commit()
+    print(f"Plan ID {args.id[0]} has been updated!")
+
 # Close database connection
 conn.close()
